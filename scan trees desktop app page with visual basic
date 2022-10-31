@@ -1,0 +1,79 @@
+// a function to scan data from pages of desktop app and save it into an excel sheet.
+
+// description in german:
+
+  ' Name:
+'  Tree_Scan
+'
+' Input:
+'	ByRef ...	As Variant 		- fachliche Eingabedaten 
+'
+' Purpose: 
+'	Bedient das Scannen von aller Daten in Maske und exportieren aller daten in excel tabelle <I>placeholder</I>.
+'
+' Author:
+'	Bahaaeldin Badr (SQS AG)
+'
+' History:
+'   23.01.2019 - 1.0 -  Bahaaeldin Badr
+'                       Erstellt
+'   04.02.2019 - 1.1 -  Bahaaeldin Badr
+'                       bearbeitet
+
+Public Sub Tree_Scan(	WindowName, _
+									Filename, _
+							 		Spalte _
+								 )
+								 
+	    //first check if excel sheet open, otherwise create a new one
+			Dim obj, obj1, obj2, iter, temp, flag, i, temp2
+			
+			Spalte = CInt(Spalte)
+			iter = 1
+			flag = 1
+			temp = "first"
+			
+			Set WshShell = CreateObject("WScript.Shell")  
+			Set obj = CreateObject("Excel.Application")  
+			obj.visible=True 
+			
+		  If(Spalte=1) then
+		        Set obj1 = obj.Workbooks.Add()
+		        obj1.SaveAs "P:\Excel_TCs" + Filename + ".xls"
+		  Else
+		        Set obj1 = obj.Workbooks.open("P:\Excel_TCs" + Filename + ".xls")    
+		        Set obj2 = obj1.Worksheets("Tabelle1")
+		
+		  End if
+      
+      // calling a function to open the desktop page to be scanned.
+      
+      Call ExpandEntry(WindowName, "placeholder")
+			
+      //iterative scanning of the desktop page line by line.
+			While flag = 1 
+			            iter = iter + 1
+			            obj.Cells(iter,Spalte).Value = JavaWindow("placeholder").JavaTree("Tree").GetROProperty("value")
+			            
+			            If(temp<>obj.Cells(iter,Spalte).Value) Then
+			                WshShell.AppActivate "placeholder" //page name
+			                
+			            	If(Spalte=1) then
+			            		WshShell.SendKeys "{RIGHT}"
+			               		Wait(0.5)
+			                End if
+			                
+			                WshShell.SendKeys "{DOWN}"
+			                Wait(0.5)
+			                
+			            Else 
+			                flag = 0 
+			            End If
+			           
+			            temp = obj.Cells(iter,Spalte).Value 
+			   WEnd
+			
+			obj1.Save()                                   
+			obj1.Close                                   
+			obj.Quit 
+End Sub
