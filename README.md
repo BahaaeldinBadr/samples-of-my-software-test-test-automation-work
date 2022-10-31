@@ -1,1 +1,1 @@
-# samples-of-my-software-test-test-automation-work
+# samples-of-my-software-test-automation-work
